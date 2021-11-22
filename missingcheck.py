@@ -1,9 +1,10 @@
 #!/usr/bin/python
 import os 
+from sys import argv
 energy_file = open("energy.dat", "r")
 energies = energy_file.readlines()
 energy_file.close()
-qffSize = 129
+qffSize = int(argv[1])
 
 miss = 1
 missing = False
