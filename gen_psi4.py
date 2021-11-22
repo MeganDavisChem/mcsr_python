@@ -1,52 +1,79 @@
 #!/usr/bin/env python3.7
 import io, os, sys, stat
 
-atoms = ["H", "O", "S", "H"]
+#This is all agnostic to the program
+#I may put all controls I need up here
+atoms = ["H", "O", "H"]
+name = "h2o+_b2"
+molname = "H2O"
+basis = "aug-cc-pVTZ"
+method = "eom-ccsd"
+theory = "tz"
+memory = 4
+nproc = 4
 #read in all of the geometries from file07
-with open('../file07') as f:
+with open('file07') as f:
         stuff = f.read()
 #split the geoms up into separateness
 geoms = stuff.split("# GEOMUP #################\n")[1:]
 #make a directory
-os.mkdir('inp')
+os.makedirs(f'{theory}')
 count = 0
-with open('inp/submit', 'w') as script:
+with open(f'{theory}/submit', 'w') as script:
         #add atom labels to the geoms
         for geom in geoms:
                 count += 1
-                os.mkdir(f'inp/{count:04}')
                 buf = io.StringIO()
                 for i,line in enumerate(geom.rstrip().split("\n")):
                         buf.write(f"{atoms[i]}{line}\n")
+                        if atoms[i] == "O":
+                            Oy = float(line.split()[1])
+                            if Oy != 0:
+                                roots = "roots_per_irrep = [1, 0]"
+                            else:
+                                roots = "roots_per_irrep = [0, 0, 0, 1]"
+
         #put the read in geoms into the {xyz} temp
                 xyz = buf.getvalue()
         #write the stuff to a file in the directory
-                with open(f'inp/{count:04}/ZMAT', 'w') as pts:
-                        pts.write(f"""HOSH CCSDT/atz single-point energy
+        #this needs to be edited for each program
+                with open(f'{theory}/{count:04}.com', 'w') as pts:
+                         pts.write(f"""#{name} {basis} {method}
+memory {memory*1000-50} mb
+
+molecule {molname}{{
+1 2
 {xyz}
+units bohr
+}}
+ 
+set globals {{
+ reference rohf
+ basis {basis}
+ freeze_core true
+ cachelevel=0
+ maxiter=500
+ dertype none
+ ints_tolerance 20
+ {roots}
+}}
 
-*CFOUR(CALC=CCSDT,BASIS=AUG-PVTZ,COORDINATES=CARTESIAN,UNITS=BOHR
-MEM_UNIT=GB,MEMORY_SIZE=8)""")
+set scf d_convergence 12
+set ccenergy r_convergence 12
+set cceom r_convergence 8
+
+energy('{method}')""")
         #copy in the pbs script
-                with open(f'inp/{count:04}/ZMAT.pbs', "w") as pbs:
-                        pbs.write(f"""#!/bin/csh
-#
-#PBS -N ZMAT_{count:04}
-#PBS -S /bin/csh
-#PBS -j oe
-#PBS -o cfour.out
-#PBS -W umask=022
-#PBS -l cput=2400:00:00
-#PBS -l mem=32gb
-#PBS -l nodes=1:ppn=4
+        #also needs to be edited per program
+                with open(f'{theory}/{count:04}.sh', "w") as pbs:
+                       pbs.write(f"""#!/bin/sh
+#SBATCH --job-name={count:04}.{name}
+#SBATCH --ntasks={nproc}
+#SBATCH --cpus-per-task=1
+#SBATCH --mem={memory}gb
 
-cd $PBS_O_WORKDIR
-setenv NUM $NCPUS
-echo "$NUM cores requested in PBS file"
-echo
-
-/ddn/home1/r1621/maple/bin/tempQC/bin/c4ext_old.sh 4""")
+/home/qc/bin/psi4v12.sh -n {nproc} -i {count:04}.com""")
         #make a submit script that submits each pbs script in its directory
-                script.write(f"""(cd {count:04}/ && qsub ZMAT.pbs\n)""")
+                script.write(f"""sbatch {count:04}.sh\n""")
 
-os.chmod('inp/submit', stat.S_IRWXU)
+os.chmod(f'{theory}/submit', stat.S_IRWXU)

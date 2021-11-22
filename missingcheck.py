@@ -1,11 +1,9 @@
 #!/usr/bin/python
 import os 
-import sys
 energy_file = open("energy.dat", "r")
 energies = energy_file.readlines()
 energy_file.close()
-qff_size = int(sys.argv[1])
-#qff_size = 723
+qffSize = 129
 
 miss = 1
 missing = False
@@ -37,17 +35,8 @@ for i in range(0,len(energies)):
 			number = '.%d.'%j
 		if number in energies[i]:
 			missing = False
-
-if qff_size < 10:
-	number = '.000%d.'%qff_size
-elif qff_size < 100:
-	number = '.00%d.'%qff_size
-elif qff_size < 1000:
-	number = '.0%d.'%qff_size
-else:
-	number = '.%d.'%qff_size
-if not (number in energies[len(energies)-1]):
-	missing_numbers.append(number)
+if not ('.0%d'%qffSize in energies[len(energies)-1]):
+	missing_numbers.append('.0%d'%qffSize)
 
 f = open("submitmissing","w")
 for num in missing_numbers:

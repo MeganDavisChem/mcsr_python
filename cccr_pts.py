@@ -1,4 +1,3 @@
-#!/usr/bin/python
 ##Molpro UCCSD(T) Version
 from __future__ import division
 import glob
