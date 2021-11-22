@@ -1,0 +1,7 @@
+sbatch *.0001.sh
+sbatch *.0002.sh
+sbatch *.0016.sh
+sbatch *.0402.sh
+sbatch *.0404.sh
+sbatch *.0407.sh
+sbatch *.0413.sh
