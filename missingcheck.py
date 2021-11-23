@@ -1,12 +1,14 @@
 #!/usr/bin/python
+#run as missingcheck.py <filename> <# points>
 import os 
 from sys import argv
 #read in energy.dat
-energy_file = open("energy.dat", "r")
+#energy_file = open("energy.dat", "r")
+energy_file = open("{}".format(argv[1]), "r")
 energies = energy_file.readlines()
 energy_file.close()
 #specify qffSize
-qffSize = int(argv[1])
+qffSize = int(argv[2])
 
 #initialize stuff
 miss = 1
@@ -38,7 +40,9 @@ if not ('.{:04}.'.format(qffSize) in energies[len(energies)-1]):
     missing_numbers.append('.{:04}.'.format(qffSize))
 
 #write submit script for eland or mcsr
-f = open("submitmissing","w")
+missingscript = "submiss_{}".format(argv[1].split(".")[0])
+
+f = open(missingscript,"w")
 if os.uname()[1] == 'master':
     for num in missing_numbers:
         f.write("sbatch *"+num+'sh\n')
@@ -46,4 +50,4 @@ else:
     for num in missing_numbers:
         f.write("qsub *"+num+'pbs\n')
 f.close()
-os.chmod("submitmissing", 0755)
+os.chmod(missingscript, 0755)
