@@ -19,7 +19,7 @@ missing_numbers = []
 for i in range(0,len(energies)):
     #set current number to iteration + number of missing points
     j = i + miss
-    number = '.{:04}.'.format(j)
+    number = '{:04}.'.format(j)
 
     #check if current number is missing
     if not (number in energies[i]):
@@ -30,14 +30,14 @@ for i in range(0,len(energies)):
         miss = miss + 1
         missing_numbers.append(number)
         j = i + miss
-        number = '.{:04}.'.format(j)
+        number = '{:04}.'.format(j)
         #return to main loop once a number is found
         if number in energies[i]:
             missing = False
 
 #check for final point
 if not ('.{:04}.'.format(qffSize) in energies[len(energies)-1]):
-    missing_numbers.append('.{:04}.'.format(qffSize))
+    missing_numbers.append('{:04}.'.format(qffSize))
 
 #write submit script for eland or mcsr
 missingscript = "submiss_{}".format(argv[1].split(".")[0])
