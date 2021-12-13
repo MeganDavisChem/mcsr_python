@@ -1,13 +1,13 @@
 #!/usr/bin/python3.4
 import io, os, sys, stat
 
-atoms = ["H", "C", "F"]
-name = "hcf_app"
-molname = "HCF"
+atoms = ["H", "N", "C", "O"]
+name = "hnco_app"
+molname = "HNCO"
 basis ="AUG-PVTZ"
 method = "CCSD(T)(a)"
 theory = "tz"
-memory = 8
+memory = 16
 nproc = 4
 #read in all of the geometries from file07
 with open('file07') as f:
