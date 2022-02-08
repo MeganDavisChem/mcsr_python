@@ -26,11 +26,16 @@ for i in range(0,len(energies)):
         missing = True
 
     #iterate over missing points until one is found
+    print(number)
+    print(energies[i])
     while missing:
         miss = miss + 1
         missing_numbers.append(number)
         j = i + miss
         number = '{:04}.'.format(j)
+        print('this is in while loop')
+        print(number)
+        print(energies[i])
         #return to main loop once a number is found
         if number in energies[i]:
             missing = False

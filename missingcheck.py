@@ -36,7 +36,7 @@ for i in range(0,len(energies)):
             missing = False
 
 #check for final point
-if not ('.{:04}.'.format(qffSize) in energies[len(energies)-1]):
+if not ('{:04}.'.format(qffSize) in energies[len(energies)-1]):
     missing_numbers.append('{:04}.'.format(qffSize))
 
 #write submit script for eland or mcsr
