@@ -19,7 +19,12 @@ missing_numbers = []
 for i in range(0,len(energies)):
     #set current number to iteration + number of missing points
     j = i + miss
-    number = '{:04}.'.format(j)
+
+    if os.uname()[1] == 'sequoia':
+        number = '{:04}/'.format(j)
+        pass
+    else:
+        number = '{:04}.'.format(j)
 
     #check if current number is missing
     if not (number in energies[i]):
@@ -30,7 +35,10 @@ for i in range(0,len(energies)):
         miss = miss + 1
         missing_numbers.append(number)
         j = i + miss
-        number = '{:04}.'.format(j)
+        if os.uname()[1] == 'sequoia':
+            number = '{:04}/'.format(j)
+        else:
+            number = '{:04}.'.format(j)
         #return to main loop once a number is found
         if number in energies[i]:
             missing = False
@@ -46,6 +54,9 @@ f = open(missingscript,"w")
 if os.uname()[1] == 'master':
     for num in missing_numbers:
         f.write("sbatch *"+num+'sh\n')
+elif os.uname()[1] == 'sequoia':
+    for num in missing_numbers:
+        f.write("(cd "+num+" && qsub ZMAT.pbs)\n")
 else:
     for num in missing_numbers:
         f.write("qsub *"+num+'pbs\n')
